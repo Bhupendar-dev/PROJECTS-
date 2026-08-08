@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Calculator Phone Body Container */
+        .calculator {
+            width: 320px;
+            background-color: #000000;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px #333;
+        }
+
+        /* Display Screen */
+        .display {
+            width: 100%;
+            height: 120px;
+            background: transparent;
+            color: #ffffff;
+            text-align: right;
+            font-size: 3rem;
+            font-weight: 300;
+            border: none;
+            outline: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        /* Keypad Grid */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Button Base Styles */
+        button {
+            height: 65px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.15s ease, transform 0.05s ease;
+            user-select: none;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        /* Number Keys (White background, Black text) */
+        .btn-num {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Sign Keys (Saffron background, White text) */
+        .btn-op {
+            background-color: #ff9933;
+            /* Saffron color */
+            color: #ffffff;
+        }
+
+        /* Function Keys (Light Gray background, Black text) */
+        .btn-func {
+            background-color: #a5a5a5;
+            color: #000000;
+        }
+
+        /* Zero Key Span across two columns */
+        .btn-zero {
+            grid-column: span 2;
+            border-radius: 35px;
+            text-align: left;
+            padding-left: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator">
+        <input type="text" class="display" id="display" value="0" readonly>
+
+        <div class="keypad">
+            <!-- Top Utility Keys -->
+            <button class="btn-func" onclick="clearDisplay()">AC</button>
+            <button class="btn-func" onclick="deleteLast()">DEL</button>
+            <button class="btn-func" onclick="appendValue('%')">%</button>
+            <button class="btn-op" onclick="appendValue('/')">÷</button>
+
+            <!-- Row 1 -->
+            <button class="btn-num" onclick="appendValue('7')">7</button>
+            <button class="btn-num" onclick="appendValue('8')">8</button>
+            <button class="btn-num" onclick="appendValue('9')">9</button>
+            <button class="btn-op" onclick="appendValue('*')">×</button>
+
+            <!-- Row 2 -->
+            <button class="btn-num" onclick="appendValue('4')">4</button>
+            <button class="btn-num" onclick="appendValue('5')">5</button>
+            <button class="btn-num" onclick="appendValue('6')">6</button>
+            <button class="btn-op" onclick="appendValue('-')">-</button>
+
+            <!-- Row 3 -->
+            <button class="btn-num" onclick="appendValue('1')">1</button>
+            <button class="btn-num" onclick="appendValue('2')">2</button>
+            <button class="btn-num" onclick="appendValue('3')">3</button>
+            <button class="btn-op" onclick="appendValue('+')">+</button>
+
+            <!-- Row 4 -->
+            <button class="btn-num btn-zero" onclick="appendValue('0')">0</button>
+            <button class="btn-num" onclick="appendValue('.')">.</button>
+            <button class="btn-op" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        // Append values to the screen
+        function appendValue(val) {
+            if (display.value === '0' || display.value === 'Error') {
+                display.value = val;
+            } else {
+                display.value += val;
+            }
+        }
+
+        // Clear all input
+        function clearDisplay() {
+            display.value = '0';
+        }
+
+        // Delete last character
+        function deleteLast() {
+            if (display.value.length === 1 || display.value === 'Error') {
+                display.value = '0';
+            } else {
+                display.value = display.value.slice(0, -1);
+            }
+        }
+
+        // Evaluate mathematical expression
+        function calculate() {
+            try {
+                // Safe evaluation without allowing arbitrary code execution
+                display.value = Function('"use strict"; return (' + display.value + ')')();
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+
+        // Laptop Keyboard Event Listener
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            if (!isNaN(key) || key === '.') {
+                appendValue(key);
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                appendValue(key);
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+                clearDisplay();
+            } else if (key === '%') {
+                appendValue('%');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
